@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人作品集</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        /* 背景容器：水波纹全屏 */
+        #waterCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background-color: #E6E2D3;
+        }
+
+        /* 整体居中 */
+        body {
+            color: #5C5246;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 920px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            margin: 40px 0 20px;
+            color: #4A443A;
+            text-align: center;
+        }
+
+        .profile {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: rgba(240, 235, 216, 0.85);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            backdrop-filter: blur(2px);
+        }
+
+        .name {
+            font-size: 38px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #4A443A;
+        }
+
+        .info {
+            font-size: 18px;
+            margin: 6px 0;
+        }
+
+        /* 核心：缩小卡片间距 */
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 28px;  /* 间距收紧 */
+            justify-items: center;
+            width: 100%;
+        }
+
+        .card {
+            background-color: rgba(240, 235, 216, 0.85);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            font-size: 26px;
+            margin-bottom: 16px;
+            color: #4A443A;
+        }
+
+        .work-img, .work-video {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin: 12px 0 20px;
+        }
+
+        .link-btn {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 18px;
+            background-color: #BCB097;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .link-btn:hover {
+            background-color: #A89D87;
+        }
+
+        .doc-list {
+            background-color: rgba(240, 235, 216, 0.85);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            width: 100%;
+            backdrop-filter: blur(2px);
+        }
+
+        .doc-item {
+            padding: 14px 0;
+            border-bottom: 1px solid #D9D4C2;
+        }
+
+        .doc-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 水波纹画布 -->
+    <canvas id="waterCanvas"></canvas>
+
+    <div class="container">
+        <!-- 个人信息 -->
+        <div class="profile">
+            <h1 class="name">你的姓名</h1>
+            <p class="info">就读学校：XXXX大学</p>
+            <p class="info">专业：XXXX专业</p>
+            <p class="info">简介：热爱艺术与技术，专注于创意作品创作</p>
+        </div>
+
+        <!-- 艺术类作品 -->
+        <h2 class="section-title">🎨 艺术类作品合集</h2>
+        <div class="works-grid">
+            <div class="card">
+                <h3 class="card-title">艺术作品1</h3>
+                <img src="https://picsum.photos/seed/art1/600/400" alt="作品图片" class="work-img">
+                <p>作品描述：PPT/绘画/设计类作品介绍</p>
+            </div>
+            <div class="card">
+                <h3 class="card-title">艺术作品2</h3>
+                <video controls class="work-video">
+                    <source src="你的视频链接.mp4" type="video/mp4">
+                    您的浏览器不支持视频播放
+                </video>
+                <p>作品描述：视频类创作介绍</p>
+            </div>
+        </div>
+
+        <!-- 技术类作品 -->
+        <h2 class="section-title">💻 技术类作品合集</h2>
+        <div class="works-grid">
+            <div class="card">
+                <h3 class="card-title">代码项目</h3>
+                <p>前端/后端/小程序等代码作品</p>
+                <a href="https://github.com/你的账号" target="_blank" class="link-btn">查看代码</a>
+            </div>
+            <div class="card">
+                <h3 class="card-title">学术论文</h3>
+                <p>发表/撰写的论文文档</p>
+                <a href="论文链接.pdf" target="_blank" class="link-btn">阅读论文</a>
+            </div>
+        </div>
+
+        <!-- 展示文档 -->
+        <h2 class="section-title">📄 展示文档</h2>
+        <div class="doc-list">
+            <div class="doc-item">
+                <h3>个人简历</h3>
+                <a href="简历链接.pdf" target="_blank" class="link-btn">打开文档</a>
+            </div>
+            <div class="doc-item">
+                <h3>项目总结报告</h3>
+                <a href="报告链接.pdf" target="_blank" class="link-btn">打开文档</a>
+            </div>
+            <div class="doc-item">
+                <h3>作品集说明文档</h3>
+                <a href="说明链接.pdf" target="_blank" class="link-btn">打开文档</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 水波纹JS -->
+    <script>
+        const canvas = document.getElementById('waterCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let ripples = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        class Ripple {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 0;
+                this.maxRadius = Math.max(width, height) * 0.6;
+                this.speed = 1.2;
+                this.opacity = 0.08;
+            }
+            update() {
+                this.radius += this.speed;
+                this.opacity -= 0.0008;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(188,176,151,${this.opacity})`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            if(Math.random() < 0.025){
+                ripples.push(new Ripple(Math.random()*width, Math.random()*height));
+            }
+            for(let i=ripples.length-1;i>=0;i--){
+                ripples[i].update();
+                ripples[i].draw();
+                if(ripples[i].opacity <=0) ripples.splice(i,1);
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
