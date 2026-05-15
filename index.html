@@ -739,9 +739,24 @@
         }
 
         @media (max-width: 900px) and (orientation: landscape) {
-            .app-container {
+            body {
+                overflow: hidden;
+                background: var(--warm-pink);
+                display: flex;
+                align-items: center;
                 justify-content: center;
+                min-height: 100dvh;
             }
+            .app-container {
+                width: 100%;
+                max-width: 900px;
+                max-height: 100dvh;
+                overflow: auto;
+                background: var(--khaki-bg);
+                box-shadow: 0 0 40px rgba(0,0,0,0.15);
+            }
+            .top-bar { flex-shrink: 0; }
+            .main-layout { flex: 1; min-height: 0; }
         }
 
         @media (max-width: 520px) {
