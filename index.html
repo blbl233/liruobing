@@ -1122,6 +1122,17 @@
                 document.body.removeChild(a);
             };
 
+            const toAbsUrl = (u) => {
+                try { return new URL(u, window.location.href).href; } catch (e) { return u; }
+            };
+
+            const getPdfOpenUrl = (absPdfUrl) => {
+                const host = window.location.hostname;
+                const isLocal = window.location.protocol === 'file:' || host === 'localhost' || host === '127.0.0.1';
+                if (isLocal) return absPdfUrl;
+                return `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(absPdfUrl)}`;
+            };
+
             const getActiveSrc = () => {
                 if (!Array.isArray(src)) return src;
                 const activeImg = document.querySelector('#inline-carousel img');
@@ -1131,12 +1142,16 @@
 
             const bindActionEvents = () => {
                 const effectiveSrc = getActiveSrc();
+                const absFileUrl = toAbsUrl(effectiveSrc);
+                const openUrl = (currentPreview && currentPreview.type === 'pdf' && absFileUrl.toLowerCase().endsWith('.pdf'))
+                    ? getPdfOpenUrl(absFileUrl)
+                    : absFileUrl;
                 actionOpen.onclick = () => {
-                    window.open(effectiveSrc, '_blank');
+                    window.open(openUrl, '_blank');
                     closeActionModal();
                 };
                 actionDownload.onclick = () => {
-                    downloadFile(effectiveSrc);
+                    downloadFile(absFileUrl);
                     closeActionModal();
                 };
             };
@@ -1179,7 +1194,9 @@
                     view.style.justifyContent = 'center';
                     view.style.alignItems = 'center';
                     view.style.padding = '0';
-                    view.innerHTML = `<iframe src="${src}" width="100%" height="100%"></iframe>`;
+                    const absPdfUrl = toAbsUrl(src);
+                    const pdfPreviewUrl = getPdfOpenUrl(absPdfUrl);
+                    view.innerHTML = `<iframe src="${pdfPreviewUrl}" width="100%" height="100%"></iframe>`;
                 }
             } else if (type === 'video') {
                 view.classList.remove('resume-scroll');
