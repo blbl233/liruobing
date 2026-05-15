@@ -739,24 +739,38 @@
         }
 
         @media (max-width: 900px) and (orientation: landscape) {
-            body {
+            html, body {
                 overflow: hidden;
+                height: 100%;
                 background: var(--warm-pink);
+            }
+            body {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                min-height: 100dvh;
             }
             .app-container {
-                width: 100%;
-                max-width: 900px;
-                max-height: 100dvh;
-                overflow: auto;
-                background: var(--khaki-bg);
-                box-shadow: 0 0 40px rgba(0,0,0,0.15);
+                width: 100vw;
+                height: 100vh;
+                transform-origin: center center;
+                overflow: hidden;
             }
-            .top-bar { flex-shrink: 0; }
-            .main-layout { flex: 1; min-height: 0; }
+            .top-bar { flex-shrink: 0; height: 36px; font-size: 11px; letter-spacing: 2px; padding: 6px 10px; }
+            .main-layout { flex: 1; min-height: 0; overflow: hidden; }
+            .sidebar { width: 200px; padding: 10px 12px; }
+            .sidebar-profile { padding: 12px; margin-bottom: 12px; }
+            .sidebar-name { font-size: 18px; }
+            .sidebar-tag { font-size: 11px; margin-bottom: 8px; }
+            .sidebar-info p { font-size: 10px; }
+            .paper-btn { height: 28px; padding: 0 10px; font-size: 10px; }
+            .sidebar-tree-container { padding: 10px; }
+            .tree-node { padding: 6px 8px; font-size: 12px; }
+            .content-area { padding: 10px 14px; }
+            .right-panel { width: 200px; padding: 10px 12px; }
+            .panel-title { margin-bottom: 12px; font-size: 12px; }
+            .file-item { padding: 10px; font-size: 12px; min-height: 40px; }
+            .cat-btn { height: 56px; font-size: 18px; }
+            .home-categories { gap: 16px; }
         }
 
         @media (max-width: 520px) {
