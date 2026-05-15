@@ -83,6 +83,24 @@
         .sidebar-tag { font-size: 13px; color: var(--warm-pink); margin-bottom: 15px; display: block; font-weight: bold; letter-spacing: 1px; }
         .sidebar-info p { font-size: 12px; margin-bottom: 6px; color: #6A5F50; display: flex; align-items: center; gap: 8px; }
         .sidebar-info img { width: 16px; height: 16px; filter: invert(76%) sepia(12%) saturate(1092%) hue-rotate(314deg) brightness(92%) contrast(90%); }
+        .profile-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
+        .paper-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 34px;
+            padding: 0 12px;
+            border-radius: 999px;
+            background: rgba(232, 162, 162, 0.22);
+            border: 1px solid rgba(232, 162, 162, 0.35);
+            color: var(--dark-khaki);
+            cursor: pointer;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            user-select: none;
+        }
+        .paper-btn:hover { background: rgba(232, 162, 162, 0.32); }
+        .paper-btn img { width: 16px; height: 16px; filter: invert(76%) sepia(12%) saturate(1092%) hue-rotate(314deg) brightness(92%) contrast(90%); }
 
         .sidebar-tree-container {
             flex: 1;
@@ -804,6 +822,12 @@
                     <div class="sidebar-info">
                         <p><img src="页面图标/其它.png" alt=""> Email: 3771517102@qq.com</p>
                         <p><img src="页面图标/其它.png" alt=""> Tel: 18957957762</p>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="paper-btn" onclick="window.open('https://doi.org/10.1142/s0218194025500688','_blank')">
+                            <img src="页面图标/文档.png" alt="">
+                            <span>论文 / Paper</span>
+                        </button>
                     </div>
                 </div>
 
