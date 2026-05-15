@@ -131,6 +131,8 @@
             flex-direction: column;
             padding: clamp(16px, 3vw, 40px);
             z-index: 5;
+            min-width: 0;
+            min-height: 0;
         }
 
         #stage-display {
@@ -141,6 +143,8 @@
             align-items: center;
             width: 100%;
             position: relative;
+            min-width: 0;
+            min-height: 0;
         }
 
         /* 首页大按钮 */
@@ -199,6 +203,8 @@
             height: 100%;
             gap: 20px;
             animation: fadeIn 0.5s ease;
+            min-width: 0;
+            min-height: 0;
         }
 
         .media-main {
@@ -213,6 +219,8 @@
             overflow: auto;
             position: relative;
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            min-width: 0;
+            min-height: 0;
         }
 
         .media-main img, .media-main video, .media-main iframe {
@@ -257,6 +265,13 @@
         .media-main.resume-scroll {
             overflow-y: scroll;
             scrollbar-gutter: stable both-edges;
+        }
+
+        .media-main.pdf-scroll {
+            display: block;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 16px;
         }
 
         .media-main.resume-scroll::after {
@@ -1201,7 +1216,7 @@
                 container.innerHTML = '';
                 container.appendChild(stack);
 
-                const availableWidth = Math.max(320, container.clientWidth - 8);
+                const availableWidth = Math.max(320, container.clientWidth - 32);
                 for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
                     const page = await pdf.getPage(pageNum);
                     const baseViewport = page.getViewport({ scale: 1 });
@@ -1225,12 +1240,16 @@
                     const isResume = currentPath.includes('个人简历');
                     if (isResume) {
                         view.classList.add('resume-scroll');
+                        view.classList.remove('pdf-scroll');
+                        view.style.display = 'flex';
                         view.style.justifyContent = 'flex-start';
                         view.style.alignItems = 'flex-start';
                         view.style.padding = '16px';
                         view.innerHTML = `<img class="resume-image" src="${src}" alt="${name}">`;
                     } else {
                         view.classList.remove('resume-scroll');
+                        view.classList.remove('pdf-scroll');
+                        view.style.display = 'flex';
                         view.style.justifyContent = 'center';
                         view.style.alignItems = 'center';
                         view.style.padding = '0';
@@ -1238,9 +1257,10 @@
                     }
                 } else {
                     view.classList.remove('resume-scroll');
-                    view.style.justifyContent = 'center';
-                    view.style.alignItems = 'center';
-                    view.style.padding = '0';
+                    view.classList.add('pdf-scroll');
+                    view.style.display = 'block';
+                    view.style.justifyContent = '';
+                    view.style.alignItems = '';
                     renderPdfWithPdfjs(src, view).catch(() => {
                         const absPdfUrl = toAbsUrl(src);
                         view.innerHTML = `<object data="${absPdfUrl}" type="application/pdf" width="100%" height="100%"></object>`;
@@ -1248,6 +1268,8 @@
                 }
             } else if (type === 'video') {
                 view.classList.remove('resume-scroll');
+                view.classList.remove('pdf-scroll');
+                view.style.display = 'flex';
                 view.innerHTML = `
                     <div class="video-wrap">
                         <video id="video-player" src="${src}" autoplay loop muted playsinline></video>
@@ -1319,11 +1341,15 @@
                 });
             } else if (type === 'carousel') {
                 view.classList.remove('resume-scroll');
+                view.classList.remove('pdf-scroll');
+                view.style.display = 'flex';
                 view.innerHTML = `<div class="inline-carousel" id="inline-carousel"></div>`;
                 setupCarousel(src, document.getElementById('inline-carousel'));
                 bindActionEvents();
             } else if (type === 'doc') {
                 view.classList.remove('resume-scroll');
+                view.classList.remove('pdf-scroll');
+                view.style.display = 'flex';
                 view.innerHTML = `
                     <div class="doc-placeholder">
                         <div class="doc-placeholder-title">${name}</div>
@@ -1332,6 +1358,8 @@
                 `;
             } else if (type === 'link') {
                 view.classList.remove('resume-scroll');
+                view.classList.remove('pdf-scroll');
+                view.style.display = 'flex';
                 view.innerHTML = `
                     <div class="doc-placeholder">
                         <div class="doc-placeholder-title">${name}</div>
