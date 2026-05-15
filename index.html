@@ -28,6 +28,23 @@
             height: 100dvh;
         }
 
+        .mobile-only {
+            display: none;
+        }
+
+        .mobile-banner {
+            width: min(520px, 92vw);
+            height: min(140px, 18vh);
+            background: #fff;
+            color: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(34px, 8vw, 46px);
+            letter-spacing: 6px;
+            font-weight: 500;
+        }
+
         /* --- 布局结构 --- */
         .app-container {
             display: flex;
@@ -752,6 +769,22 @@
                 align-items: center;
                 justify-content: center;
             }
+            .app-container,
+            #intro-overlay,
+            #bg-video-container,
+            #loader,
+            #waterCanvas {
+                display: none !important;
+            }
+            .mobile-only {
+                position: fixed;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--warm-pink);
+                z-index: 100000;
+            }
             .app-container {
                 width: 100vw;
                 height: 100vh;
@@ -799,6 +832,9 @@
     <script src="vendor/pdfjs/pdf.min.js"></script>
 </head>
 <body>
+    <div class="mobile-only">
+        <div class="mobile-banner">页面</div>
+    </div>
     <!-- 开场动画层 -->
     <div id="intro-overlay">
         <div class="pink-sea">
