@@ -22,7 +22,7 @@
         }
 
         body {
-            background-color: #fff;
+            background-color: var(--khaki-bg);
             color: var(--dark-khaki);
             overflow: hidden;
             height: 100dvh;
@@ -35,9 +35,6 @@
             height: 100dvh;
             width: 100vw;
             position: relative;
-            background: var(--khaki-bg);
-            max-width: 1440px;
-            margin: 0 auto;
         }
 
         .top-bar {
@@ -723,7 +720,28 @@
         @media (max-width: 900px) {
             body { overflow: auto; }
             .top-bar { letter-spacing: 3px; font-size: 12px; height: auto; min-height: 44px; padding: 10px 12px; }
-            .app-container { min-width: 1100px; }
+            .main-layout { flex-direction: column; }
+            .sidebar { width: 100%; padding: 14px 16px; border-right: none; border-bottom: 1px solid rgba(0,0,0,0.05); gap: 12px; }
+            .sidebar-profile { margin-bottom: 0; padding: 16px; }
+            .sidebar-name { font-size: 22px; }
+            .sidebar-tag { margin-bottom: 10px; }
+            .sidebar-tree-container { flex: none; max-height: 28vh; overflow-y: auto; }
+            .right-panel { width: 100%; padding: 14px 16px; border-left: none; border-top: 1px solid rgba(0,0,0,0.05); }
+            #file-browser { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+            .file-item { width: calc(50% - 5px); }
+            .content-area { padding: 14px 16px; min-height: 52vh; }
+            .home-categories { max-width: 100%; }
+            .home-categories { grid-template-columns: 1fr; }
+            .cat-btn { height: 72px; font-size: 20px; }
+            .carousel-dots { bottom: 10px; }
+            .video-wrap { padding: 12px; }
+            .video-controls { gap: 10px; }
+        }
+
+        @media (max-width: 900px) and (orientation: landscape) {
+            .app-container {
+                justify-content: center;
+            }
         }
 
         @media (max-width: 520px) {
@@ -1449,14 +1467,14 @@
             constructor(x, y, isMove = false) {
                 this.x = x; this.y = y; this.radius = 0;
                 this.maxRadius = isMove ? 80 : 150;
-                this.opacity = isMove ? 0.15 : 0.3;
+                this.opacity = isMove ? 0.35 : 0.65;
                 this.fadeSpeed = isMove ? 0.01 : 0.005;
             }
             update() { this.radius += 1.5; this.opacity -= this.fadeSpeed; }
             draw() {
                 if (this.opacity <= 0) return;
                 ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(232, 162, 162, ${this.opacity})`;
+                ctx.strokeStyle = `rgba(232, 162, 162, ${Math.min(1, this.opacity * 2.5)})`;
                 ctx.lineWidth = 1; ctx.stroke();
             }
         }
