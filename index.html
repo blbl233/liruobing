@@ -3,253 +3,1365 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人作品集</title>
+    <title>李若冰的作品集</title>
     <style>
+        :root {
+            --warm-pink: #E8A2A2;
+            --khaki-bg: #DCD0C0;
+            --dark-khaki: #5D5348;
+            --nav-green: #E8A2A2;
+            --glass-white: rgba(255, 255, 255, 0.4);
+            --icon-green: #D48C8C;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Microsoft YaHei", sans-serif;
+            font-family: "Optima", "Candara", "Noto Sans SC", "Microsoft YaHei", sans-serif;
         }
 
-        /* 背景容器：水波纹全屏 */
-        #waterCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            background-color: #E6E2D3;
-        }
-
-        /* 整体居中 */
         body {
-            color: #5C5246;
-            line-height: 1.6;
+            background-color: var(--khaki-bg);
+            color: var(--dark-khaki);
+            overflow: hidden;
+            height: 100dvh;
+        }
+
+        /* --- 布局结构 --- */
+        .app-container {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 40px 20px;
+            height: 100dvh;
+            width: 100vw;
             position: relative;
         }
 
-        .container {
-            width: 100%;
-            max-width: 920px;
-        }
-
-        .section-title {
-            font-size: 28px;
-            margin: 40px 0 20px;
-            color: #4A443A;
+        .top-bar {
+            height: 40px;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            letter-spacing: 10px;
+            z-index: 100;
+            padding: 0 16px;
             text-align: center;
         }
 
-        .profile {
-            text-align: center;
-            padding: 40px 20px;
-            background-color: rgba(240, 235, 216, 0.85);
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- 侧边栏 --- */
+        .sidebar {
+            width: clamp(220px, 22vw, 320px);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(30px);
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            z-index: 10;
+        }
+
+        .sidebar-profile {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(0,0,0,0.08);
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            backdrop-filter: blur(2px);
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        .name {
-            font-size: 38px;
-            font-weight: bold;
-            margin-bottom: 12px;
-            color: #4A443A;
+        .sidebar-name { font-size: 26px; margin-bottom: 8px; font-weight: 500; letter-spacing: 2px; }
+        .sidebar-tag { font-size: 13px; color: var(--warm-pink); margin-bottom: 15px; display: block; font-weight: bold; letter-spacing: 1px; }
+        .sidebar-info p { font-size: 12px; margin-bottom: 6px; color: #6A5F50; display: flex; align-items: center; gap: 8px; }
+        .sidebar-info img { width: 16px; height: 16px; filter: invert(76%) sepia(12%) saturate(1092%) hue-rotate(314deg) brightness(92%) contrast(90%); }
+
+        .sidebar-tree-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 12px;
+            padding: 15px;
+            overflow-y: auto;
         }
 
-        .info {
-            font-size: 18px;
-            margin: 6px 0;
-        }
-
-        /* 核心：缩小卡片间距 */
-        .works-grid {
+        .tree-title { font-size: 12px; font-weight: bold; margin-bottom: 12px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
+        .tree-node { 
+            cursor: pointer; 
+            padding: 8px 10px; 
+            font-size: 14px; 
+            transition: all 0.2s; 
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-            gap: 28px;  /* 间距收紧 */
-            justify-items: center;
-            width: 100%;
-        }
-
-        .card {
-            background-color: rgba(240, 235, 216, 0.85);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            backdrop-filter: blur(2px);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card-title {
-            font-size: 26px;
-            margin-bottom: 16px;
-            color: #4A443A;
-        }
-
-        .work-img, .work-video {
-            width: 100%;
-            height: 240px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin: 12px 0 20px;
-        }
-
-        .link-btn {
-            display: inline-block;
-            margin-top: 12px;
-            padding: 8px 18px;
-            background-color: #BCB097;
-            color: white;
-            text-decoration: none;
+            grid-template-columns: 20px 1fr;
+            align-items: center;
+            column-gap: 10px;
             border-radius: 6px;
-            transition: background 0.2s;
+            margin-bottom: 2px;
+            line-height: 1.2;
+        }
+        .tree-node:hover { background: rgba(255,255,255,0.3); color: var(--icon-green); }
+        .tree-node .node-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tree-node .node-icon img { 
+            width: 18px; height: 18px; 
+            filter: invert(76%) sepia(12%) saturate(1092%) hue-rotate(314deg) brightness(92%) contrast(90%); 
+        }
+        .tree-node:hover .node-icon img { filter: invert(70%) sepia(14%) saturate(1290%) hue-rotate(314deg) brightness(88%) contrast(92%); }
+        .tree-node .node-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .tree-children { margin-left: 10px; border-left: 1px solid rgba(0,0,0,0.05); padding-left: 14px; }
+
+        /* --- 中央内容区 --- */
+        .content-area {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: clamp(16px, 3vw, 40px);
+            z-index: 5;
         }
 
-        .link-btn:hover {
-            background-color: #A89D87;
-        }
-
-        .doc-list {
-            background-color: rgba(240, 235, 216, 0.85);
-            border-radius: 12px;
-            padding: 30px;
-            text-align: center;
+        #stage-display {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             width: 100%;
-            backdrop-filter: blur(2px);
+            position: relative;
         }
 
-        .doc-item {
-            padding: 14px 0;
-            border-bottom: 1px solid #D9D4C2;
+        /* 首页大按钮 */
+        .home-categories {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 760px;
         }
 
-        .doc-item:last-child {
-            border-bottom: none;
+        .cat-btn {
+            background: var(--nav-green);
+            color: #fff;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+            box-shadow: 0 10px 20px rgba(232, 162, 162, 0.32);
+            position: relative;
+            overflow: hidden;
+            gap: 12px;
         }
+
+        .cat-btn::after {
+            content: '➔';
+            position: absolute;
+            right: 20px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s;
+        }
+
+        .cat-btn:hover {
+            transform: translateY(-5px);
+            background: var(--icon-green);
+            box-shadow: 0 15px 30px rgba(212, 140, 140, 0.42);
+        }
+
+        .cat-btn:hover::after {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* 预览区域 */
+        #preview-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            gap: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .media-main {
+            flex: 1;
+            background: rgba(255,255,255,0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .media-main img, .media-main video, .media-main iframe {
+            max-width: 100%;
+            max-height: 100%;
+            border: none;
+            border-radius: 4px;
+            object-fit: contain;
+        }
+
+        .media-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .resume-image {
+            width: 100%;
+            height: auto;
+            max-width: none;
+            max-height: none;
+            display: block;
+        }
+
+        .media-main::-webkit-scrollbar {
+            width: 14px;
+            height: 14px;
+        }
+
+        .media-main::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.18);
+            border-radius: 999px;
+        }
+
+        .media-main::-webkit-scrollbar-thumb {
+            background: rgba(232, 162, 162, 0.78);
+            border-radius: 999px;
+            border: 3px solid rgba(255,255,255,0.18);
+        }
+
+        .media-main.resume-scroll {
+            overflow-y: scroll;
+            scrollbar-gutter: stable both-edges;
+        }
+
+        .media-main.resume-scroll::after {
+            content: '';
+            position: absolute;
+            top: 14px;
+            right: 8px;
+            width: 6px;
+            height: 34px;
+            border-radius: 999px;
+            background: rgba(232, 162, 162, 0.55);
+            pointer-events: none;
+            opacity: 0.65;
+        }
+
+        .doc-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+            gap: 14px;
+            color: var(--dark-khaki);
+        }
+
+        .doc-placeholder-title {
+            font-size: 18px;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .doc-placeholder-sub {
+            font-size: 13px;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .video-wrap {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: stretch;
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .video-wrap video {
+            width: 100%;
+            height: calc(100% - 56px);
+            object-fit: contain;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.15);
+        }
+
+        .video-controls {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.22);
+            backdrop-filter: blur(12px);
+        }
+
+        .video-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.15);
+            color: var(--dark-khaki);
+            border-radius: 10px;
+            padding: 8px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .video-btn img {
+            width: 18px;
+            height: 18px;
+            filter: invert(76%) sepia(12%) saturate(1092%) hue-rotate(314deg) brightness(92%) contrast(90%);
+        }
+
+        .video-seek {
+            flex: 1;
+            appearance: none;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.15);
+            outline: none;
+        }
+
+        .video-seek::-webkit-slider-thumb {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--icon-green);
+            border: 2px solid rgba(255,255,255,0.8);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .video-time {
+            font-size: 12px;
+            opacity: 0.8;
+            letter-spacing: 0.5px;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        .side-controls {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 20;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #fff;
+            padding: 15px;
+            width: 80px;
+            height: 80px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .control-btn:hover {
+            background: #fff;
+            color: var(--dark-khaki);
+            transform: scale(1.1);
+        }
+
+        .control-btn span:first-child { font-size: 20px; }
+
+        /* --- 右侧面板 --- */
+        .right-panel {
+            width: clamp(220px, 22vw, 320px);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(25px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .panel-title { 
+            font-size: 14px; 
+            font-weight: bold; 
+            margin-bottom: 25px; 
+            text-align: center; 
+            opacity: 0.6;
+            letter-spacing: 2px;
+        }
+
+        #file-browser {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .file-item {
+            background: #fff;
+            color: var(--dark-khaki);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: grid;
+            grid-template-columns: 28px 1fr 18px;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.03);
+            justify-content: flex-start;
+            min-height: 52px;
+        }
+
+        .file-item.is-folder {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .file-item .item-icon {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-item .item-icon img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .file-item .item-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-item .chev {
+            justify-self: end;
+            opacity: 0.55;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .file-item img { 
+            width: 24px; height: 24px; 
+            filter: invert(76%) sepia(12%) saturate(1092%) hue-rotate(314deg) brightness(92%) contrast(90%); 
+        }
+
+        .file-item:hover {
+            transform: translateX(-8px);
+            background: var(--nav-green);
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(232, 162, 162, 0.38);
+        }
+
+        .file-item:hover img { filter: brightness(0) invert(1); }
+
+        /* 轮播图内置于页面 */
+        .inline-carousel {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .carousel-image {
+            width: 100%;
+            height: 100%;
+            max-width: 86%;
+            max-height: 86%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .carousel-dots {
+            position: absolute;
+            left: 50%;
+            bottom: 16px;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.22);
+            border: 1px solid rgba(255,255,255,0.28);
+            backdrop-filter: blur(12px);
+        }
+
+        .carousel-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.12);
+            background: rgba(93, 83, 72, 0.28);
+            cursor: pointer;
+        }
+
+        .carousel-dot.active {
+            background: rgba(232, 162, 162, 0.92);
+            box-shadow: 0 0 0 4px rgba(232, 162, 162, 0.22);
+            border-color: rgba(232, 162, 162, 0.35);
+        }
+
+        body.is-carousel .right-panel {
+            display: none;
+        }
+
+        body.is-carousel .content-area {
+            padding-right: clamp(16px, 3vw, 40px);
+        }
+
+        body.is-carousel #preview-container {
+            justify-content: center;
+            align-items: center;
+        }
+
+        body.is-carousel .media-main {
+            flex: none;
+            width: min(860px, 92vw);
+            height: min(560px, 68vh);
+        }
+
+        @media (max-width: 900px) {
+            body.is-carousel .media-main {
+                width: 100%;
+                height: 100%;
+                flex: 1;
+            }
+        }
+
+        .action-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.35);
+            z-index: 99999;
+            padding: 20px;
+        }
+
+        .action-modal.active {
+            display: flex;
+        }
+
+        .action-card {
+            width: min(520px, 92vw);
+            border-radius: 18px;
+            background: rgba(255,255,255,0.22);
+            border: 1px solid rgba(255,255,255,0.25);
+            backdrop-filter: blur(18px);
+            padding: 18px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .action-title {
+            font-size: 14px;
+            letter-spacing: 1px;
+            color: #fff;
+            opacity: 0.95;
+            text-align: center;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            height: 54px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.16);
+            border: 1px solid rgba(255,255,255,0.28);
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .action-btn img {
+            width: 18px;
+            height: 18px;
+            filter: brightness(0) invert(1);
+        }
+
+        .action-btn.primary {
+            background: rgba(232, 162, 162, 0.7);
+            border-color: rgba(232, 162, 162, 0.55);
+        }
+
+        .action-hint {
+            font-size: 12px;
+            color: rgba(255,255,255,0.9);
+            opacity: 0.85;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 900px) {
+            body { overflow: auto; }
+            .top-bar { letter-spacing: 3px; font-size: 12px; height: auto; min-height: 44px; padding: 10px 12px; }
+            .main-layout { flex-direction: column; }
+            .sidebar { width: 100%; padding: 16px; border-right: none; border-bottom: 1px solid rgba(0,0,0,0.05); }
+            .right-panel { width: 100%; padding: 14px 16px; border-left: none; border-top: 1px solid rgba(0,0,0,0.05); }
+            #file-browser { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+            .file-item { width: calc(50% - 5px); }
+            .content-area { padding: 14px 16px; min-height: 52vh; }
+            .home-categories { max-width: 100%; }
+            .home-categories { grid-template-columns: 1fr; }
+            .cat-btn { height: 72px; font-size: 20px; }
+            .carousel-dots { bottom: 10px; }
+            .video-wrap { padding: 12px; }
+            .video-controls { gap: 10px; }
+        }
+
+        @media (max-width: 520px) {
+            .file-item { width: 100%; }
+            .video-time { display: none; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 其他 --- */
+        #intro-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #fff; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 1s ease-out;
+        }
+        .pink-sea { position: absolute; bottom: -110%; left: 0; width: 100%; height: 110%; background-color: var(--warm-pink); z-index: -1; animation: seaRise 3s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+        .waves { position: absolute; top: -100px; left: 0; width: 100%; height: 100px; }
+        .wave-path { animation: waveMove 3s linear infinite; }
+        .wave-path:nth-child(2) { animation-delay: -2s; opacity: 0.5; }
+        .wave-path:nth-child(3) { animation-delay: -1s; opacity: 0.3; }
+        @keyframes waveMove { 0% { transform: translateX(0); } 100% { transform: translateX(-400px); } }
+        @keyframes seaRise { 0% { bottom: -110%; } 100% { bottom: 0; } }
+        .intro-content { text-align: center; color: white; opacity: 0; transform: translateY(20px); animation: contentFadeIn 1.5s ease 1s forwards; }
+        @keyframes contentFadeIn { to { opacity: 1; transform: translateY(0); } }
+        .intro-name { font-size: 60px; letter-spacing: 8px; margin-bottom: 20px; font-weight: 300; }
+        .intro-info { font-size: 18px; margin: 10px 0; letter-spacing: 2px; }
+
+        #bg-video-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; overflow: hidden; }
+        .bg-video { position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%; width: auto; height: auto; transform: translate(-50%, -50%); opacity: 0; transition: opacity 1s ease; object-fit: cover; }
+        .bg-video.active { opacity: 0.4; }
+
+        #waterCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.9; }
+        #loader { position: fixed; bottom: 20px; right: 20px; width: 50px; z-index: 100; }
+
     </style>
 </head>
 <body>
-    <!-- 水波纹画布 -->
-    <canvas id="waterCanvas"></canvas>
-
-    <div class="container">
-        <!-- 个人信息 -->
-        <div class="profile">
-            <h1 class="name">你的姓名</h1>
-            <p class="info">就读学校：XXXX大学</p>
-            <p class="info">专业：XXXX专业</p>
-            <p class="info">简介：热爱艺术与技术，专注于创意作品创作</p>
+    <!-- 开场动画层 -->
+    <div id="intro-overlay">
+        <div class="pink-sea">
+            <svg class="waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none">
+                <defs>
+                    <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                </defs>
+                <g class="wave-path">
+                    <use href="#gentle-wave" x="48" y="0" fill="var(--warm-pink)" />
+                </g>
+                <g class="wave-path">
+                    <use href="#gentle-wave" x="48" y="3" fill="var(--warm-pink)" />
+                </g>
+                <g class="wave-path">
+                    <use href="#gentle-wave" x="48" y="5" fill="var(--warm-pink)" />
+                </g>
+            </svg>
         </div>
-
-        <!-- 艺术类作品 -->
-        <h2 class="section-title">🎨 艺术类作品合集</h2>
-        <div class="works-grid">
-            <div class="card">
-                <h3 class="card-title">艺术作品1</h3>
-                <img src="https://picsum.photos/seed/art1/600/400" alt="作品图片" class="work-img">
-                <p>作品描述：PPT/绘画/设计类作品介绍</p>
-            </div>
-            <div class="card">
-                <h3 class="card-title">艺术作品2</h3>
-                <video controls class="work-video">
-                    <source src="你的视频链接.mp4" type="video/mp4">
-                    您的浏览器不支持视频播放
-                </video>
-                <p>作品描述：视频类创作介绍</p>
-            </div>
-        </div>
-
-        <!-- 技术类作品 -->
-        <h2 class="section-title">💻 技术类作品合集</h2>
-        <div class="works-grid">
-            <div class="card">
-                <h3 class="card-title">代码项目</h3>
-                <p>前端/后端/小程序等代码作品</p>
-                <a href="https://github.com/你的账号" target="_blank" class="link-btn">查看代码</a>
-            </div>
-            <div class="card">
-                <h3 class="card-title">学术论文</h3>
-                <p>发表/撰写的论文文档</p>
-                <a href="论文链接.pdf" target="_blank" class="link-btn">阅读论文</a>
-            </div>
-        </div>
-
-        <!-- 展示文档 -->
-        <h2 class="section-title">📄 展示文档</h2>
-        <div class="doc-list">
-            <div class="doc-item">
-                <h3>个人简历</h3>
-                <a href="简历链接.pdf" target="_blank" class="link-btn">打开文档</a>
-            </div>
-            <div class="doc-item">
-                <h3>项目总结报告</h3>
-                <a href="报告链接.pdf" target="_blank" class="link-btn">打开文档</a>
-            </div>
-            <div class="doc-item">
-                <h3>作品集说明文档</h3>
-                <a href="说明链接.pdf" target="_blank" class="link-btn">打开文档</a>
-            </div>
+        <div class="intro-content">
+            <h1 class="intro-name">李若冰</h1>
+            <p class="intro-info">北京林业大学 / Beijing Forestry University</p>
+            <p class="intro-info">Email: 3771517102@qq.com</p>
+            <p class="intro-info">Tel: 18957957762</p>
         </div>
     </div>
 
-    <!-- 水波纹JS -->
+    <!-- 背景视频 -->
+    <div id="bg-video-container">
+        <video id="tech-bg" class="bg-video" loop muted playsinline src="页面图标/技术背景图.mp4"></video>
+        <video id="design-bg" class="bg-video" loop muted playsinline src="页面图标/设计背景.mp4"></video>
+    </div>
+
+    <!-- 加载图标 -->
+    <img id="loader" src="页面图标/加载图标.gif" alt="Loading">
+
+    <!-- 水波纹 -->
+    <canvas id="waterCanvas"></canvas>
+
+    <!-- 主应用 -->
+    <div class="app-container">
+        <div class="top-bar">提示 / Tip：双击预览区域弹出“下载/打开”（手机端长按）</div>
+        <div class="main-layout" id="main-app">
+            <!-- 左侧侧边栏 -->
+            <aside class="sidebar">
+                <div class="sidebar-profile">
+                    <h2 class="sidebar-name">李若冰</h2>
+                    <span class="sidebar-tag">北京林业大学 / Beijing Forestry University</span>
+                    <div class="sidebar-info">
+                        <p><img src="页面图标/其它.png" alt=""> Email: 3771517102@qq.com</p>
+                        <p><img src="页面图标/其它.png" alt=""> Tel: 18957957762</p>
+                    </div>
+                </div>
+
+                <div class="sidebar-tree-container">
+                    <div class="tree-title">快捷跳转 / Quick Jump</div>
+                    <div id="nav-tree">
+                        <!-- 动态生成树形导航 -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 中间内容展示区 -->
+            <main class="content-area">
+                <div id="stage-display">
+                    <!-- 动态切换：首页大按钮 或 预览区域 -->
+                </div>
+            </main>
+
+            <!-- 右侧选项面板 -->
+            <aside class="right-panel">
+                <div class="panel-title">文件选项 / Options</div>
+                <div id="file-browser">
+                    <!-- 动态生成列表项 -->
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div id="action-modal" class="action-modal" role="dialog" aria-modal="true">
+        <div class="action-card">
+            <div class="action-title" id="action-title">操作 / Actions</div>
+            <div class="action-row">
+                <button class="action-btn primary" id="action-open">
+                    <img src="页面图标/其它.png" alt="">
+                    <span>打开 / Open</span>
+                </button>
+                <button class="action-btn" id="action-download">
+                    <img src="页面图标/文档.png" alt="">
+                    <span>下载 / Download</span>
+                </button>
+            </div>
+            <div class="action-hint">点击空白处关闭 / Tap outside to close</div>
+        </div>
+    </div>
+
+
     <script>
+        // --- 文件树定义 (更新了 PDF 预览路径) ---
+        const fileTree = {
+            '个人简历': {
+                type: 'folder',
+                desc: '个人背景与经历介绍',
+                children: {
+                    '简历预览': { type: 'pdf', src: '个人简历/北京林业大学-李若冰-2026(1).pdf', desc: '查看完整简历 PDF' }
+                }
+            },
+            '技术创新': {
+                type: 'folder',
+                bg: 'tech',
+                desc: '专利、大创项目及学术成果',
+                children: {
+                    '专利': {
+                        type: 'folder',
+                        children: {
+                            '文档': {
+                                type: 'folder',
+                                children: {
+                                    '人工智能合规审计（预览）': { type: 'pdf', src: '技术创新/专利/文档/人工智能合规审计预览.pdf' },
+                                    '信息系统故障检测（预览）': { type: 'pdf', src: '技术创新/专利/文档/信息系统故障检测预览.pdf' },
+                                    '审计方法（原文）': { type: 'doc', src: '技术创新/专利/文档/李若冰+一种基于人工智能的信息系统操作合规审计方法.docx' },
+                                    '故障定位（原文）': { type: 'doc', src: '技术创新/专利/文档/李若冰+一种基于双向深度神经网络的信息系统故障定位方法.docx' }
+                                }
+                            },
+                            'PPT': {
+                                type: 'folder',
+                                children: {
+                                    'PPT（预览）': { type: 'pdf', src: '技术创新/专利/ppt/ppt.pdf' },
+                                    'PPT（原文件）': { type: 'doc', src: '技术创新/专利/ppt/一种基于人工智能的信息系统操作合规审计方法.pptx' }
+                                }
+                            }
+                        }
+                    },
+                    '大创项目': {
+                        type: 'folder',
+                        children: {
+                            '规则引擎工具': {
+                                type: 'folder',
+                                children: {
+                                    '项目预览': { type: 'pdf', src: '技术创新/大创/基于 AI 生成代码错误修复的规则引擎工具/预览.pdf' },
+                                    'PPT预览': { type: 'pdf', src: '技术创新/大创/基于 AI 生成代码错误修复的规则引擎工具/ppt.pdf' },
+                                    '项目原文': { type: 'doc', src: '技术创新/大创/基于 AI 生成代码错误修复的规则引擎工具/《基于 AI 生成代码错误修复的规则引擎工具》.docx' }
+                                }
+                            },
+                            '焕新IP设计': {
+                                type: 'folder',
+                                children: {
+                                    '方案预览': { type: 'pdf', src: '技术创新/大创/基于文化传承下的三山五园焕新IP设计/预览.pdf' },
+                                    '设计原文': { type: 'doc', src: '技术创新/大创/基于文化传承下的三山五园焕新IP设计/《基于文化传承下的三山五园焕新IP设计》.docx' }
+                                }
+                            },
+                            '树龄估算系统': {
+                                type: 'folder',
+                                children: {
+                                    '系统预览': { type: 'pdf', src: '技术创新/大创/基于深度学习的树龄估算系统/预览.pdf' },
+                                    'PPT预览': { type: 'pdf', src: '技术创新/大创/基于深度学习的树龄估算系统/ppt.pdf' },
+                                    '开发原文': { type: 'doc', src: '技术创新/大创/基于深度学习的树龄估算系统/《基于深度学习的树龄估算系统》.docx' }
+                                }
+                            }
+                        }
+                    },
+                    '学术论文': { type: 'link', src: 'https://doi.org/10.1142/s0218194025500688', desc: '发表于国际期刊的学术论文' }
+                }
+            },
+            '设计展示': {
+                type: 'folder',
+                bg: 'design',
+                desc: '原创设计、IP创作及视觉海报',
+                children: {
+                    '作品集ppt': {
+                        type: 'folder',
+                        children: {
+                            '作品集（PDF预览）': { type: 'pdf', src: '设计展示/作品集ppt/作品集.pdf' }
+                        }
+                    },
+                    'IP形象': {
+                        type: 'carousel',
+                        images: [
+                            '设计展示/ip形象/276c62156aaac487ebb3e3a13b5818d7.jpg',
+                            '设计展示/ip形象/7058bfcf42535d772726dad7743d9102.jpg',
+                            '设计展示/ip形象/7c60be09dc61aa2f372c002af7245c14.jpg',
+                            '设计展示/ip形象/ac97308a785e1689f4d27919924419ee.png',
+                            '设计展示/ip形象/bdff16597ef8ddc6be07aa860cca5413.png',
+                            '设计展示/ip形象/ef375256fab21683ed779b80c657c066.jpg',
+                            '设计展示/ip形象/f7782291a2c2b1fdd08c6cb3f32932c9.jpg'
+                        ]
+                    },
+                    '海报': {
+                        type: 'carousel',
+                        images: [
+                            '设计展示/海报/2973bc0e4b5e3f9fffb1b5324cf2f0f2.jpg',
+                            '设计展示/海报/2d9a19721c16d404c3c93914960504d3.jpg',
+                            '设计展示/海报/f73644a46a9ae12afed5861d0a4c1bf1.jpg'
+                        ]
+                    },
+                    '图像': {
+                        type: 'carousel',
+                        images: [
+                            '设计展示/图像/6ffaeb76cdca04422a00b5419324989b.jpg',
+                            '设计展示/图像/842305040b2caee2af17fce8fe2ed9e6.jpg',
+                            '设计展示/图像/c3b890c7b450e8ddeca5465530c17bcd.jpg'
+                        ]
+                    },
+                    '视频作品': {
+                        type: 'folder',
+                        children: {
+                            '农耕宇宙': { type: 'video', src: '设计展示/视频/农耕宇宙/游戏展示.mp4' },
+                            '校内宣传': { type: 'video', src: '设计展示/视频/校内宣传/宣传展示.mp4' }
+                        }
+                    }
+                }
+            }
+        };
+
+        let currentPath = [];
+        let currentPreview = null;
+        let carouselState = { timer: null, index: 0, images: [] };
+
+        const actionModal = document.getElementById('action-modal');
+        const actionTitle = document.getElementById('action-title');
+        const actionOpen = document.getElementById('action-open');
+        const actionDownload = document.getElementById('action-download');
+
+        const openActionModal = () => {
+            if (!currentPreview) return;
+            actionTitle.textContent = `${currentPreview.name} / Actions`;
+            actionModal.classList.add('active');
+        };
+
+        const closeActionModal = () => {
+            actionModal.classList.remove('active');
+        };
+
+        actionModal.addEventListener('click', (e) => {
+            if (e.target === actionModal) closeActionModal();
+        });
+
+        // --- 初始化与开场 ---
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('intro-overlay').style.opacity = '0';
+                document.getElementById('main-app').style.opacity = '1';
+                setTimeout(() => {
+                    document.getElementById('intro-overlay').style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 1000);
+            }, 3500);
+
+            renderTree(fileTree, document.getElementById('nav-tree'));
+            renderBrowser();
+        };
+
+        // --- 树形导航渲染 ---
+        function renderTree(data, container, path = '') {
+            for (let name in data) {
+                const item = data[name];
+                if (item.type === 'folder' || item.type === 'carousel') {
+                    const fullPath = path + (path ? '/' : '') + name;
+                    const node = document.createElement('div');
+                    node.className = 'tree-node';
+                    
+                    let icon = '页面图标/其它.png';
+                    if (item.type === 'carousel') icon = '页面图标/其它.png';
+                    
+                    node.innerHTML = `<span class="node-icon"><img src="${icon}" alt=""></span><span class="node-text">${name}</span>`;
+                    node.onclick = (e) => {
+                        e.stopPropagation();
+                        navigateTo(fullPath);
+                    };
+                    container.appendChild(node);
+
+                    if (item.children) {
+                        const childrenContainer = document.createElement('div');
+                        childrenContainer.className = 'tree-children';
+                        container.appendChild(childrenContainer);
+                        renderTree(item.children, childrenContainer, fullPath);
+                    }
+                }
+            }
+        }
+
+        // --- 核心渲染逻辑 ---
+        function navigateTo(pathStr) {
+            currentPath = pathStr === '' ? [] : pathStr.split('/');
+            renderBrowser();
+        }
+
+        function renderBrowser() {
+            const stage = document.getElementById('stage-display');
+            const browser = document.getElementById('file-browser');
+            browser.innerHTML = '';
+            document.body.classList.remove('is-carousel');
+            if (carouselState.timer) {
+                clearInterval(carouselState.timer);
+                carouselState.timer = null;
+            }
+            closeActionModal();
+            
+            // 获取当前层级数据
+            let currentData = fileTree;
+            let currentBg = null;
+            let currentItem = null;
+
+            currentPath.forEach(p => {
+                currentItem = currentData[p];
+                if (currentItem) {
+                    if (currentItem.bg) currentBg = currentItem.bg;
+                    currentData = currentItem.children || currentItem;
+                }
+            });
+
+            // 更新背景视频
+            updateBackground(currentBg);
+
+            if (currentPath.length === 0) {
+                // 首页：显示三大分类大按钮
+                stage.innerHTML = `
+                    <div class="home-categories">
+                        <div class="cat-btn" onclick="navigateTo('个人简历')">
+                            <img src="页面图标/其它.png" style="width:30px; height:30px; margin-right:15px; filter:brightness(0) invert(1);">
+                            个人简历 / Resume
+                        </div>
+                        <div class="cat-btn" onclick="navigateTo('设计展示')">
+                            <img src="页面图标/其它.png" style="width:30px; height:30px; margin-right:15px; filter:brightness(0) invert(1);">
+                            设计展示 / Design
+                        </div>
+                        <div class="cat-btn" onclick="navigateTo('技术创新')">
+                            <img src="页面图标/其它.png" style="width:30px; height:30px; margin-right:15px; filter:brightness(0) invert(1);">
+                            技术创新 / Innovation
+                        </div>
+                    </div>
+                `;
+            } else {
+                if (currentItem && currentItem.type === 'carousel') {
+                    renderPreview('carousel', currentItem.images, currentPath[currentPath.length-1]);
+                } else if (currentPath.length === 1 && currentPath[0] === '设计展示') {
+                    stage.innerHTML = `<h2 style="font-size:30px; letter-spacing:6px; opacity:0.18; font-weight:900;">设计展示 / Design</h2>`;
+                } else if (currentPath.length === 1 && (currentPath[0] === '技术创新')) {
+                    stage.innerHTML = `<h2 style="font-size:30px; letter-spacing:6px; opacity:0.18; font-weight:900;">技术创新 / Innovation</h2>`;
+                } else if (currentItem && currentItem.type === 'folder') {
+                    stage.innerHTML = `<h2 style="font-size:22px; opacity:0.32; letter-spacing:3px;">${currentPath.join(' / ')}</h2>`;
+                }
+
+                // 渲染右侧列表
+                const getIconForItem = (it) => {
+                    if (!it) return '页面图标/其它.png';
+                    if (it.type === 'folder') return '页面图标/其它.png';
+                    if (it.type === 'video') return '页面图标/视频.png';
+                    if (it.type === 'carousel') return '页面图标/其它.png';
+                    if (it.type === 'pdf') return '页面图标/文档.png';
+                    if (it.type === 'link') return '页面图标/其它.png';
+                    if (it.type === 'doc') {
+                        const s = (it.src || '').toLowerCase();
+                        if (s.endsWith('.pptx')) return '页面图标/ppt.png';
+                        return '页面图标/文档.png';
+                    }
+                    return '页面图标/其它.png';
+                };
+
+                for (let name in currentData) {
+                    const item = currentData[name];
+                    const div = document.createElement('div');
+                    div.className = 'file-item';
+                    const icon = getIconForItem(item);
+                    if (item && item.type === 'folder') div.classList.add('is-folder');
+                    div.innerHTML = `<span class="item-icon"><img src="${icon}" alt=""></span><span class="item-text">${name}</span>${item && item.type === 'folder' ? '<span class="chev">›</span>' : '<span class="chev"></span>'}`;
+                    div.onclick = () => handleItemClick(name, item);
+                    browser.appendChild(div);
+                }
+            }
+        }
+
+        function handleItemClick(name, item) {
+            if (item.type === 'folder') {
+                currentPath.push(name);
+                renderBrowser();
+            } else {
+                renderPreview(item.type, item.src || item.images, name);
+            }
+        }
+
+        function renderPreview(type, src, name) {
+            const stage = document.getElementById('stage-display');
+            document.body.classList.toggle('is-carousel', type === 'carousel');
+            currentPreview = { type, src, name };
+
+            if (carouselState.timer) {
+                clearInterval(carouselState.timer);
+                carouselState.timer = null;
+            }
+
+            stage.innerHTML = `
+                <div id="preview-container">
+                    <div class="media-main" id="media-view"></div>
+                </div>
+            `;
+
+            const view = document.getElementById('media-view');
+
+            const downloadFile = (fileSrc) => {
+                const a = document.createElement('a');
+                a.href = fileSrc;
+                a.download = fileSrc.split('/').pop();
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            };
+
+            const getActiveSrc = () => {
+                if (!Array.isArray(src)) return src;
+                const activeImg = document.querySelector('#inline-carousel img');
+                if (activeImg) return activeImg.getAttribute('src') || src[0];
+                return src[0];
+            };
+
+            const bindActionEvents = () => {
+                const effectiveSrc = getActiveSrc();
+                actionOpen.onclick = () => {
+                    window.open(effectiveSrc, '_blank');
+                    closeActionModal();
+                };
+                actionDownload.onclick = () => {
+                    downloadFile(effectiveSrc);
+                    closeActionModal();
+                };
+            };
+
+            bindActionEvents();
+
+            let pressTimer = null;
+            view.ondblclick = () => openActionModal();
+            view.ontouchstart = () => {
+                pressTimer = window.setTimeout(() => {
+                    openActionModal();
+                }, 520);
+            };
+            view.ontouchend = () => {
+                if (pressTimer) {
+                    clearTimeout(pressTimer);
+                    pressTimer = null;
+                }
+            };
+
+            if (type === 'pdf') {
+                // 图片预览或 PDF 预览 (如果是 pdf 格式，直接用 iframe)
+                if (src.endsWith('.jpg') || src.endsWith('.png')) {
+                    const isResume = currentPath.includes('个人简历');
+                    if (isResume) {
+                        view.classList.add('resume-scroll');
+                        view.style.justifyContent = 'flex-start';
+                        view.style.alignItems = 'flex-start';
+                        view.style.padding = '16px';
+                        view.innerHTML = `<img class="resume-image" src="${src}" alt="${name}">`;
+                    } else {
+                        view.classList.remove('resume-scroll');
+                        view.style.justifyContent = 'center';
+                        view.style.alignItems = 'center';
+                        view.style.padding = '0';
+                        view.innerHTML = `<img class="media-image" src="${src}" alt="${name}">`;
+                    }
+                } else {
+                    view.classList.remove('resume-scroll');
+                    view.style.justifyContent = 'center';
+                    view.style.alignItems = 'center';
+                    view.style.padding = '0';
+                    view.innerHTML = `<iframe src="${src}" width="100%" height="100%"></iframe>`;
+                }
+            } else if (type === 'video') {
+                view.classList.remove('resume-scroll');
+                view.innerHTML = `
+                    <div class="video-wrap">
+                        <video id="video-player" src="${src}" autoplay loop muted playsinline></video>
+                        <div class="video-controls">
+                            <button class="video-btn" id="mute-toggle">
+                                <img src="页面图标/视频.png" alt="">
+                                <span id="mute-text">静音 / Mute</span>
+                            </button>
+                            <button class="video-btn" id="video-download">
+                                <img src="页面图标/文档.png" alt="">
+                                <span>下载 / Download</span>
+                            </button>
+                            <input class="video-seek" id="video-seek" type="range" min="0" max="1000" value="0">
+                            <div class="video-time" id="video-time">00:00 / 00:00</div>
+                        </div>
+                    </div>
+                `;
+
+                const player = document.getElementById('video-player');
+                const seek = document.getElementById('video-seek');
+                const muteToggle = document.getElementById('mute-toggle');
+                const muteText = document.getElementById('mute-text');
+                const timeEl = document.getElementById('video-time');
+                const videoDownload = document.getElementById('video-download');
+
+                const pad2 = (n) => String(n).padStart(2, '0');
+                const fmt = (t) => {
+                    if (!Number.isFinite(t) || t < 0) return '00:00';
+                    const m = Math.floor(t / 60);
+                    const s = Math.floor(t % 60);
+                    return `${pad2(m)}:${pad2(s)}`;
+                };
+
+                const updateTime = () => {
+                    const dur = player.duration;
+                    const cur = player.currentTime;
+                    timeEl.textContent = `${fmt(cur)} / ${fmt(dur)}`;
+                };
+
+                const updateSeek = () => {
+                    const dur = player.duration;
+                    if (!Number.isFinite(dur) || dur <= 0) return;
+                    seek.value = String(Math.round((player.currentTime / dur) * 1000));
+                };
+
+                player.addEventListener('loadedmetadata', () => {
+                    updateTime();
+                    updateSeek();
+                });
+
+                player.addEventListener('timeupdate', () => {
+                    updateTime();
+                    updateSeek();
+                });
+
+                seek.addEventListener('input', () => {
+                    const dur = player.duration;
+                    if (!Number.isFinite(dur) || dur <= 0) return;
+                    player.currentTime = (Number(seek.value) / 1000) * dur;
+                });
+
+                muteToggle.addEventListener('click', () => {
+                    player.muted = !player.muted;
+                    muteText.textContent = player.muted ? '静音 / Mute' : '有声 / Sound';
+                });
+
+                videoDownload.addEventListener('click', () => {
+                    downloadFile(src);
+                });
+            } else if (type === 'carousel') {
+                view.classList.remove('resume-scroll');
+                view.innerHTML = `<div class="inline-carousel" id="inline-carousel"></div>`;
+                setupCarousel(src, document.getElementById('inline-carousel'));
+                bindActionEvents();
+            } else if (type === 'doc') {
+                view.classList.remove('resume-scroll');
+                view.innerHTML = `
+                    <div class="doc-placeholder">
+                        <div class="doc-placeholder-title">${name}</div>
+                        <div class="doc-placeholder-sub">此文件为 Office 格式，请下载后查看<br>Office file: please download to view</div>
+                    </div>
+                `;
+            } else if (type === 'link') {
+                view.classList.remove('resume-scroll');
+                view.innerHTML = `
+                    <div class="doc-placeholder">
+                        <div class="doc-placeholder-title">${name}</div>
+                        <button class="cat-btn" style="margin-top:6px; width:260px; height:56px; font-size:16px" onclick="window.open('${src}', '_blank')">访问链接 / Open Link</button>
+                    </div>
+                `;
+            }
+        }
+
+        function setupCarousel(images, container) {
+            carouselState.index = 0;
+            carouselState.images = images.slice();
+
+            const imgEl = document.createElement('img');
+            imgEl.className = 'carousel-image';
+            imgEl.alt = 'carousel';
+            container.innerHTML = '';
+            container.appendChild(imgEl);
+
+            const dots = document.createElement('div');
+            dots.className = 'carousel-dots';
+            const dotEls = images.map((_, i) => {
+                const d = document.createElement('div');
+                d.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+                d.onclick = () => {
+                    carouselState.index = i;
+                    render();
+                };
+                dots.appendChild(d);
+                return d;
+            });
+            container.appendChild(dots);
+
+            const render = () => {
+                imgEl.src = carouselState.images[carouselState.index];
+                imgEl.style.animation = 'none';
+                imgEl.offsetHeight;
+                imgEl.style.animation = 'fadeIn 0.35s ease';
+                dotEls.forEach((d, i) => d.classList.toggle('active', i === carouselState.index));
+            };
+
+            render();
+            carouselState.timer = setInterval(() => {
+                if (!document.getElementById('inline-carousel')) {
+                    clearInterval(carouselState.timer);
+                    carouselState.timer = null;
+                    return;
+                }
+                carouselState.index = (carouselState.index + 1) % carouselState.images.length;
+                render();
+            }, 1600);
+        }
+
+        function updateBackground(bgType) {
+            const tech = document.getElementById('tech-bg');
+            const design = document.getElementById('design-bg');
+            tech.classList.remove('active');
+            design.classList.remove('active');
+            if (bgType === 'tech') { tech.classList.add('active'); tech.play(); }
+            else if (bgType === 'design') { design.classList.add('active'); design.play(); }
+        }
+
+        // --- 水波纹效果 (保持) ---
         const canvas = document.getElementById('waterCanvas');
         const ctx = canvas.getContext('2d');
-        let width, height;
-        let ripples = [];
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
+        let width, height, ripples = [];
+        function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
         resize();
         window.addEventListener('resize', resize);
-
         class Ripple {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.radius = 0;
-                this.maxRadius = Math.max(width, height) * 0.6;
-                this.speed = 1.2;
-                this.opacity = 0.08;
+            constructor(x, y, isMove = false) {
+                this.x = x; this.y = y; this.radius = 0;
+                this.maxRadius = isMove ? 80 : 150;
+                this.opacity = isMove ? 0.15 : 0.3;
+                this.fadeSpeed = isMove ? 0.01 : 0.005;
             }
-            update() {
-                this.radius += this.speed;
-                this.opacity -= 0.0008;
-            }
+            update() { this.radius += 1.5; this.opacity -= this.fadeSpeed; }
             draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(188,176,151,${this.opacity})`;
-                ctx.lineWidth = 1;
-                ctx.stroke();
+                if (this.opacity <= 0) return;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(232, 162, 162, ${this.opacity})`;
+                ctx.lineWidth = 1; ctx.stroke();
             }
         }
-
+        let lastMouseX = 0, lastMouseY = 0;
+        window.addEventListener('mousemove', (e) => {
+            const dist = Math.sqrt(Math.pow(e.clientX - lastMouseX, 2) + Math.pow(e.clientY - lastMouseY, 2));
+            if (dist > 30) { ripples.push(new Ripple(e.clientX, e.clientY, true)); lastMouseX = e.clientX; lastMouseY = e.clientY; }
+        });
+        window.addEventListener('mousedown', (e) => { ripples.push(new Ripple(e.clientX, e.clientY, false)); });
         function animate() {
             ctx.clearRect(0, 0, width, height);
-            if(Math.random() < 0.025){
-                ripples.push(new Ripple(Math.random()*width, Math.random()*height));
-            }
-            for(let i=ripples.length-1;i>=0;i--){
-                ripples[i].update();
-                ripples[i].draw();
-                if(ripples[i].opacity <=0) ripples.splice(i,1);
+            for(let i = ripples.length - 1; i >= 0; i--){
+                ripples[i].update(); ripples[i].draw();
+                if(ripples[i].opacity <= 0) ripples.splice(i, 1);
             }
             requestAnimationFrame(animate);
         }
