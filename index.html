@@ -28,23 +28,6 @@
             height: 100dvh;
         }
 
-        .mobile-only {
-            display: none;
-        }
-
-        .mobile-banner {
-            width: min(520px, 92vw);
-            height: min(140px, 18vh);
-            background: #fff;
-            color: #111;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: clamp(34px, 8vw, 46px);
-            letter-spacing: 6px;
-            font-weight: 500;
-        }
-
         /* --- 布局结构 --- */
         .app-container {
             display: flex;
@@ -735,27 +718,6 @@
         }
 
         @media (max-width: 900px) {
-            body { overflow: auto; }
-            .top-bar { letter-spacing: 3px; font-size: 12px; height: auto; min-height: 44px; padding: 10px 12px; }
-            .main-layout { flex-direction: column; }
-            .sidebar { width: 100%; padding: 14px 16px; border-right: none; border-bottom: 1px solid rgba(0,0,0,0.05); gap: 12px; }
-            .sidebar-profile { margin-bottom: 0; padding: 16px; }
-            .sidebar-name { font-size: 22px; }
-            .sidebar-tag { margin-bottom: 10px; }
-            .sidebar-tree-container { flex: none; max-height: 28vh; overflow-y: auto; }
-            .right-panel { width: 100%; padding: 14px 16px; border-left: none; border-top: 1px solid rgba(0,0,0,0.05); }
-            #file-browser { flex-direction: row; flex-wrap: wrap; gap: 10px; }
-            .file-item { width: calc(50% - 5px); }
-            .content-area { padding: 14px 16px; min-height: 52vh; }
-            .home-categories { max-width: 100%; }
-            .home-categories { grid-template-columns: 1fr; }
-            .cat-btn { height: 72px; font-size: 20px; }
-            .carousel-dots { bottom: 10px; }
-            .video-wrap { padding: 12px; }
-            .video-controls { gap: 10px; }
-        }
-
-        @media (max-width: 900px) {
             html, body {
                 overflow: hidden;
                 height: 100%;
@@ -768,22 +730,6 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-            }
-            .app-container,
-            #intro-overlay,
-            #bg-video-container,
-            #loader,
-            #waterCanvas {
-                display: none !important;
-            }
-            .mobile-only {
-                position: fixed;
-                inset: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: var(--warm-pink);
-                z-index: 100000;
             }
             .app-container {
                 width: 100vw;
@@ -832,9 +778,6 @@
     <script src="vendor/pdfjs/pdf.min.js"></script>
 </head>
 <body>
-    <div class="mobile-only">
-        <div class="mobile-banner">页面</div>
-    </div>
     <!-- 开场动画层 -->
     <div id="intro-overlay">
         <div class="pink-sea">
@@ -1547,7 +1490,7 @@
         }
         animate();
 
-        // 手机端：将整个页面按比例缩放，完整显示在手机屏幕内
+        // 手机端：将整个页面按比例缩放，完整显示在手机屏幕内（多余区域用粉色背景填充）
         function fitMobileScreen() {
             if (window.innerWidth > 900) return;
             const app = document.querySelector('.app-container');
