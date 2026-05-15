@@ -12,6 +12,8 @@
             --nav-green: #E8A2A2;
             --glass-white: rgba(255, 255, 255, 0.4);
             --icon-green: #D48C8C;
+            --desktop-stage-width: 1440px;
+            --desktop-stage-height: 900px;
         }
 
         * {
@@ -718,6 +720,27 @@
         }
 
         @media (max-width: 900px) {
+            body { overflow: auto; }
+            .top-bar { letter-spacing: 3px; font-size: 12px; height: auto; min-height: 44px; padding: 10px 12px; }
+            .main-layout { flex-direction: column; }
+            .sidebar { width: 100%; padding: 14px 16px; border-right: none; border-bottom: 1px solid rgba(0,0,0,0.05); gap: 12px; }
+            .sidebar-profile { margin-bottom: 0; padding: 16px; }
+            .sidebar-name { font-size: 22px; }
+            .sidebar-tag { margin-bottom: 10px; }
+            .sidebar-tree-container { flex: none; max-height: 28vh; overflow-y: auto; }
+            .right-panel { width: 100%; padding: 14px 16px; border-left: none; border-top: 1px solid rgba(0,0,0,0.05); }
+            #file-browser { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+            .file-item { width: calc(50% - 5px); }
+            .content-area { padding: 14px 16px; min-height: 52vh; }
+            .home-categories { max-width: 100%; }
+            .home-categories { grid-template-columns: 1fr; }
+            .cat-btn { height: 72px; font-size: 20px; }
+            .carousel-dots { bottom: 10px; }
+            .video-wrap { padding: 12px; }
+            .video-controls { gap: 10px; }
+        }
+
+        @media (max-width: 900px) {
             html, body {
                 overflow: hidden;
                 height: 100%;
@@ -773,6 +796,12 @@
 
         #waterCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.9; }
         #loader { position: fixed; bottom: 20px; right: 20px; width: 50px; z-index: 100; }
+
+        body.mobile-desktop-mode { overflow: hidden !important; background-color: var(--warm-pink); }
+        .mobile-desktop-outer { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--warm-pink); z-index: 1; }
+        .mobile-desktop-sizebox { position: relative; overflow: hidden; }
+        .mobile-desktop-inner { position: absolute; top: 0; left: 0; width: var(--desktop-stage-width); height: var(--desktop-stage-height); transform-origin: top left; }
+        body.mobile-desktop-mode .app-container { width: var(--desktop-stage-width); height: var(--desktop-stage-height); }
 
     </style>
     <script src="vendor/pdfjs/pdf.min.js"></script>
@@ -1490,24 +1519,116 @@
         }
         animate();
 
-        // 手机端：将整个页面按比例缩放，完整显示在手机屏幕内（多余区域用粉色背景填充）
-        function fitMobileScreen() {
-            if (window.innerWidth > 900) return;
+        (function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isEmbed = urlParams.get('desktopEmbed') === '1';
+            if (isEmbed) return;
+
             const app = document.querySelector('.app-container');
             if (!app) return;
-            // 以 1920x1080 为电脑基准分辨率
-            const baseW = 1920;
-            const baseH = 1080;
-            const scaleX = window.innerWidth / baseW;
-            const scaleY = window.innerHeight / baseH;
-            const scale = Math.min(scaleX, scaleY);
-            app.style.transform = `scale(${scale})`;
-            app.style.width = baseW + 'px';
-            app.style.height = baseH + 'px';
-        }
-        window.addEventListener('resize', fitMobileScreen);
-        window.addEventListener('load', fitMobileScreen);
-        setTimeout(fitMobileScreen, 100);
+
+            const getStageSize = () => {
+                const styles = getComputedStyle(document.documentElement);
+                const w = parseFloat(styles.getPropertyValue('--desktop-stage-width')) || 1440;
+                const h = parseFloat(styles.getPropertyValue('--desktop-stage-height')) || 900;
+                return { w, h };
+            };
+
+            let outer = null;
+            let sizebox = null;
+            let inner = null;
+            let frame = null;
+            let rafId = 0;
+            const hidden = new Map();
+
+            const ensureWrappers = () => {
+                if (outer) return;
+                outer = document.createElement('div');
+                outer.className = 'mobile-desktop-outer';
+                sizebox = document.createElement('div');
+                sizebox.className = 'mobile-desktop-sizebox';
+                inner = document.createElement('div');
+                inner.className = 'mobile-desktop-inner';
+                outer.appendChild(sizebox);
+                sizebox.appendChild(inner);
+
+                frame = document.createElement('iframe');
+                frame.setAttribute('title', 'Desktop View');
+                frame.setAttribute('frameborder', '0');
+                frame.setAttribute('scrolling', 'no');
+                frame.style.width = 'var(--desktop-stage-width)';
+                frame.style.height = 'var(--desktop-stage-height)';
+                frame.style.border = '0';
+                frame.style.display = 'block';
+                const u = new URL(window.location.href);
+                u.searchParams.set('desktopEmbed', '1');
+                frame.src = u.toString();
+                inner.appendChild(frame);
+            };
+
+            const wantsMobileDesktop = () => window.matchMedia('(max-width: 900px)').matches;
+
+            const updateScale = () => {
+                if (!document.body.classList.contains('mobile-desktop-mode')) return;
+                if (!sizebox || !inner) return;
+                const { w, h } = getStageSize();
+                const scale = Math.min(window.innerWidth / w, window.innerHeight / h);
+                sizebox.style.width = (w * scale) + 'px';
+                sizebox.style.height = (h * scale) + 'px';
+                inner.style.transform = 'scale(' + scale + ')';
+            };
+
+            const scheduleUpdate = () => {
+                cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(updateScale);
+            };
+
+            const hideElement = (el) => {
+                if (!el || hidden.has(el)) return;
+                hidden.set(el, el.style.display);
+                el.style.display = 'none';
+            };
+
+            const restoreHidden = () => {
+                for (const [el, prev] of hidden.entries()) {
+                    el.style.display = prev || '';
+                }
+                hidden.clear();
+            };
+
+            const enable = () => {
+                if (document.body.classList.contains('mobile-desktop-mode')) return;
+                ensureWrappers();
+                hideElement(document.getElementById('intro-overlay'));
+                hideElement(document.getElementById('bg-video-container'));
+                hideElement(document.getElementById('waterCanvas'));
+                hideElement(document.getElementById('loader'));
+                hideElement(document.getElementById('action-modal'));
+                hideElement(app);
+                document.body.appendChild(outer);
+                document.body.classList.add('mobile-desktop-mode');
+                updateScale();
+            };
+
+            const disable = () => {
+                if (!document.body.classList.contains('mobile-desktop-mode')) return;
+                document.body.classList.remove('mobile-desktop-mode');
+                if (outer && outer.parentNode) outer.parentNode.removeChild(outer);
+                restoreHidden();
+                if (sizebox) { sizebox.style.width = ''; sizebox.style.height = ''; }
+                if (inner) inner.style.transform = '';
+            };
+
+            const sync = () => {
+                if (wantsMobileDesktop()) enable();
+                else disable();
+                scheduleUpdate();
+            };
+
+            window.addEventListener('resize', sync, { passive: true });
+            window.addEventListener('orientationchange', sync, { passive: true });
+            sync();
+        })();
     </script>
 </body>
 </html>
