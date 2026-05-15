@@ -577,6 +577,29 @@
             height: min(560px, 68vh);
         }
 
+        .pdf-stack {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .pdf-page {
+            width: 100%;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.35);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .pdf-loading {
+            width: 100%;
+            padding: 18px;
+            text-align: center;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+
         @media (max-width: 900px) {
             body.is-carousel .media-main {
                 width: 100%;
@@ -713,6 +736,7 @@
         #loader { position: fixed; bottom: 20px; right: 20px; width: 50px; z-index: 100; }
 
     </style>
+    <script src="vendor/pdfjs/pdf.min.js"></script>
 </head>
 <body>
     <!-- 开场动画层 -->
@@ -947,6 +971,10 @@
             actionModal.classList.remove('active');
         };
 
+        if (window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions) {
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdfjs/pdf.worker.min.js';
+        }
+
         actionModal.addEventListener('click', (e) => {
             if (e.target === actionModal) closeActionModal();
         });
@@ -1126,13 +1154,6 @@
                 try { return new URL(u, window.location.href).href; } catch (e) { return u; }
             };
 
-            const getPdfOpenUrl = (absPdfUrl) => {
-                const host = window.location.hostname;
-                const isLocal = window.location.protocol === 'file:' || host === 'localhost' || host === '127.0.0.1';
-                if (isLocal) return absPdfUrl;
-                return `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(absPdfUrl)}`;
-            };
-
             const getActiveSrc = () => {
                 if (!Array.isArray(src)) return src;
                 const activeImg = document.querySelector('#inline-carousel img');
@@ -1143,11 +1164,8 @@
             const bindActionEvents = () => {
                 const effectiveSrc = getActiveSrc();
                 const absFileUrl = toAbsUrl(effectiveSrc);
-                const openUrl = (currentPreview && currentPreview.type === 'pdf' && absFileUrl.toLowerCase().endsWith('.pdf'))
-                    ? getPdfOpenUrl(absFileUrl)
-                    : absFileUrl;
                 actionOpen.onclick = () => {
-                    window.open(openUrl, '_blank');
+                    window.open(absFileUrl, '_blank');
                     closeActionModal();
                 };
                 actionDownload.onclick = () => {
@@ -1169,6 +1187,35 @@
                 if (pressTimer) {
                     clearTimeout(pressTimer);
                     pressTimer = null;
+                }
+            };
+
+            const renderPdfWithPdfjs = async (pdfUrl, container) => {
+                if (!window.pdfjsLib || !window.pdfjsLib.getDocument) throw new Error('pdfjs not available');
+                container.innerHTML = `<div class="pdf-loading">PDF 加载中 / Loading…</div>`;
+                const absUrl = toAbsUrl(pdfUrl);
+                const loadingTask = window.pdfjsLib.getDocument({ url: absUrl });
+                const pdf = await loadingTask.promise;
+                const stack = document.createElement('div');
+                stack.className = 'pdf-stack';
+                container.innerHTML = '';
+                container.appendChild(stack);
+
+                const availableWidth = Math.max(320, container.clientWidth - 8);
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    const baseViewport = page.getViewport({ scale: 1 });
+                    const scale = Math.min(2.2, Math.max(1, availableWidth / baseViewport.width));
+                    const viewport = page.getViewport({ scale });
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'pdf-page';
+                    canvas.width = Math.floor(viewport.width);
+                    canvas.height = Math.floor(viewport.height);
+                    canvas.style.width = '100%';
+                    canvas.style.height = 'auto';
+                    stack.appendChild(canvas);
+                    const ctx2d = canvas.getContext('2d');
+                    await page.render({ canvasContext: ctx2d, viewport }).promise;
                 }
             };
 
@@ -1194,9 +1241,10 @@
                     view.style.justifyContent = 'center';
                     view.style.alignItems = 'center';
                     view.style.padding = '0';
-                    const absPdfUrl = toAbsUrl(src);
-                    const pdfPreviewUrl = getPdfOpenUrl(absPdfUrl);
-                    view.innerHTML = `<iframe src="${pdfPreviewUrl}" width="100%" height="100%"></iframe>`;
+                    renderPdfWithPdfjs(src, view).catch(() => {
+                        const absPdfUrl = toAbsUrl(src);
+                        view.innerHTML = `<object data="${absPdfUrl}" type="application/pdf" width="100%" height="100%"></object>`;
+                    });
                 }
             } else if (type === 'video') {
                 view.classList.remove('resume-scroll');
