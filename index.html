@@ -738,11 +738,14 @@
             .video-controls { gap: 10px; }
         }
 
-        @media (max-width: 900px) and (orientation: landscape) {
+        @media (max-width: 900px) {
             html, body {
                 overflow: hidden;
                 height: 100%;
+                width: 100%;
                 background: var(--warm-pink);
+                margin: 0;
+                padding: 0;
             }
             body {
                 display: flex;
@@ -753,24 +756,9 @@
                 width: 100vw;
                 height: 100vh;
                 transform-origin: center center;
+                background: var(--khaki-bg);
                 overflow: hidden;
             }
-            .top-bar { flex-shrink: 0; height: 36px; font-size: 11px; letter-spacing: 2px; padding: 6px 10px; }
-            .main-layout { flex: 1; min-height: 0; overflow: hidden; }
-            .sidebar { width: 200px; padding: 10px 12px; }
-            .sidebar-profile { padding: 12px; margin-bottom: 12px; }
-            .sidebar-name { font-size: 18px; }
-            .sidebar-tag { font-size: 11px; margin-bottom: 8px; }
-            .sidebar-info p { font-size: 10px; }
-            .paper-btn { height: 28px; padding: 0 10px; font-size: 10px; }
-            .sidebar-tree-container { padding: 10px; }
-            .tree-node { padding: 6px 8px; font-size: 12px; }
-            .content-area { padding: 10px 14px; }
-            .right-panel { width: 200px; padding: 10px 12px; }
-            .panel-title { margin-bottom: 12px; font-size: 12px; }
-            .file-item { padding: 10px; font-size: 12px; min-height: 40px; }
-            .cat-btn { height: 56px; font-size: 18px; }
-            .home-categories { gap: 16px; }
         }
 
         @media (max-width: 520px) {
@@ -1522,6 +1510,25 @@
             requestAnimationFrame(animate);
         }
         animate();
+
+        // 手机端：将整个页面按比例缩放，完整显示在手机屏幕内
+        function fitMobileScreen() {
+            if (window.innerWidth > 900) return;
+            const app = document.querySelector('.app-container');
+            if (!app) return;
+            // 以 1920x1080 为电脑基准分辨率
+            const baseW = 1920;
+            const baseH = 1080;
+            const scaleX = window.innerWidth / baseW;
+            const scaleY = window.innerHeight / baseH;
+            const scale = Math.min(scaleX, scaleY);
+            app.style.transform = `scale(${scale})`;
+            app.style.width = baseW + 'px';
+            app.style.height = baseH + 'px';
+        }
+        window.addEventListener('resize', fitMobileScreen);
+        window.addEventListener('load', fitMobileScreen);
+        setTimeout(fitMobileScreen, 100);
     </script>
 </body>
 </html>
